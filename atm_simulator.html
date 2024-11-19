@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>ATM Simulator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+        }
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        input, button {
+            margin: 10px 0;
+            padding: 10px;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="loginScreen">
+            <h2>ATM Giriş</h2>
+            <input type="password" id="passwordInput" placeholder="Şifrenizi girin">
+            <button onclick="login()">Giriş</button>
+            <p id="errorMessage"></p>
+        </div>
+
+        <div id="menuScreen" style="display:none;">
+            <h2>Ana Menü</h2>
+            <p>Bakiye: <span id="balanceDisplay">5000</span> TL</p>
+            <button onclick="showWithdrawScreen()">Para Çek</button>
+            <button onclick="showDepositScreen()">Para Yatır</button>
+            <button onclick="logout()">Çıkış</button>
+        </div>
+
+        <div id="withdrawScreen" style="display:none;">
+            <h2>Para Çekme</h2>
+            <p>Mevcut Bakiye: <span id="withdrawBalance"></span> TL</p>
+            <input type="number" id="withdrawAmount" placeholder="Çekmek istediğiniz miktar">
+            <button onclick="withdraw()">Para Çek</button>
+            <button onclick="backToMenu()">Geri Dön</button>
+            <p id="withdrawError"></p>
+        </div>
+
+        <div id="depositScreen" style="display:none;">
+            <h2>Para Yatırma</h2>
+            <p>Mevcut Bakiye: <span id="depositBalance"></span> TL</p>
+            <input type="number" id="depositAmount" placeholder="Yatırmak istediğiniz miktar">
+            <button onclick="deposit()">Para Yatır</button>
+            <button onclick="backToMenu()">Geri Dön</button>
+        </div>
+    </div>
+
+    <script>
+        const correctPassword = '3131';
+        let balance = 5000;
+
+        function login() {
+            const passwordInput = document.getElementById('passwordInput');
+            const errorMessage = document.getElementById('errorMessage');
+            const loginScreen = document.getElementById('loginScreen');
+            const menuScreen = document.getElementById('menuScreen');
+
+            if (passwordInput.value === correctPassword) {
+                loginScreen.style.display = 'none';
+                menuScreen.style.display = 'block';
+                errorMessage.textContent = '';
+            } else {
+                errorMessage.textContent = 'Yanlış şifre';
+            }
+        }
+
+        function showWithdrawScreen() {
+            document.getElementById('menuScreen').style.display = 'none';
+            document.getElementById('withdrawScreen').style.display = 'block';
+            document.getElementById('withdrawBalance').textContent = balance;
+            document.getElementById('withdrawError').textContent = '';
+        }
+
+        function showDepositScreen() {
+            document.getElementById('menuScreen').style.display = 'none';
+            document.getElementById('depositScreen').style.display = 'block';
+            document.getElementById('depositBalance').textContent = balance;
+        }
+
+        function withdraw() {
+            const withdrawAmount = parseInt(document.getElementById('withdrawAmount').value);
+            const withdrawError = document.getElementById('withdrawError');
+            const balanceDisplay = document.getElementById('balanceDisplay');
+
+            if (withdrawAmount > 0) {
+                if (withdrawAmount <= balance) {
+                    balance -= withdrawAmount;
+                    balanceDisplay.textContent = balance;
+                    backToMenu();
+                } else {
+                    withdrawError.textContent = 'Yetersiz bakiye. Para yüklemek ister misiniz?';
+                    document.getElementById('withdrawScreen').innerHTML += 
+                        '<button onclick="showDepositScreen()">Para Yükle</button>';
+                }
+            } else {
+                withdrawError.textContent = 'Geçerli bir miktar girin';
+            }
+        }
+
+        function deposit() {
+            const depositAmount = parseInt(document.getElementById('depositAmount').value);
+            const balanceDisplay = document.getElementById('balanceDisplay');
+
+            if (depositAmount > 0) {
+                balance += depositAmount;
+                balanceDisplay.textContent = balance;
+                backToMenu();
+            } else {
+                alert('Geçerli bir miktar girin');
+            }
+        }
+
+        function backToMenu() {
+            document.getElementById('withdrawScreen').style.display = 'none';
+            document.getElementById('depositScreen').style.display = 'none';
+            document.getElementById('menuScreen').style.display = 'block';
+        }
+
+        function logout() {
+            document.getElementById('menuScreen').style.display = 'none';
+            document.getElementById('loginScreen').style.display = 'block';
+            document.getElementById('passwordInput').value = '';
+        }
+    </script>
+</body>
+</html>
